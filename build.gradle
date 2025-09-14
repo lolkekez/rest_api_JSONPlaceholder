@@ -1,0 +1,53 @@
+plugins {
+    id 'java'
+    id 'io.qameta.allure' version '2.11.2'
+    id "io.freefair.lombok" version "8.6"
+}
+
+group = 'com.api.testing'
+version = '2.0'
+
+allure {
+    allureReport {
+        version.set("2.25.0")
+    }
+    adapter { // отвечает за появление папки allure-results
+        aspectjWeaver.set(true)
+        aspectjVersion.set("1.9.21")
+        frameworks {
+            junit5 {
+                adapterVersion.set("2.25.0")
+            }
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
+
+dependencies {
+    testImplementation(
+            'org.junit.jupiter:junit-jupiter:5.10.1',
+            'io.rest-assured:rest-assured:5.4.0',
+            'io.rest-assured:json-schema-validator:5.4.0',
+            'org.slf4j:slf4j-simple:2.0.12',
+            'io.qameta.allure:allure-rest-assured:2.21.0',
+            'org.assertj:assertj-core:3.24.2'
+    )
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+    systemProperties(System.getProperties())
+    testLogging {
+        lifecycle {
+            events "started","skipped","failed","standard_error","standard_out"
+            exceptionFormat "short"
+        }
+    }
+}
