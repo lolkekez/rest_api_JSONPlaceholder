@@ -1,0 +1,93 @@
+package com.api.testing.tests;
+
+import com.api.testing.core.BaseTest;
+import com.api.testing.models.User;
+import com.api.testing.utils.ApiClient;
+import io.qameta.allure.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import static io.qameta.allure.Allure.step;
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * Тесты для управления пользователями
+ * Покрывает основные операции с пользователями
+ */
+@DisplayName("Управление пользователями")
+@Owner("API Testing Team")
+@Feature("User Management")
+@Story("CRUD Operations")
+public class UserManagementTests extends BaseTest {
+    
+    private final ApiClient apiClient = new ApiClient(requestSpec);
+    
+    @Test
+    @DisplayName("Получение существующего пользователя по ID")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Проверяем корректность получения данных пользователя по валидному ID")
+    void shouldGetExistingUserById() {
+        // Given
+        int userId = 1;
+        
+        // When
+        User user = step("Получаем пользователя по ID " + userId, () ->
+                apiClient.get("/users/" + userId)
+                        .then()
+                        .spec(successResponseSpec)
+                        .extract().as(User.class));
+        
+        // Then
+        step("Проверяем корректность данных пользователя", () -> {
+            assertThat(user).isNotNull();
+            assertThat(user.getId()).isEqualTo(userId);
+            assertThat(user.getName()).isNotEmpty();
+            assertThat(user.getEmail()).isNotEmpty();
+            assertThat(user.getUsername()).isNotEmpty();
+            
+            // Проверяем, что email содержит @
+            assertThat(user.getEmail()).contains("@");
+            assertThat(user.isValidEmail()).isTrue();
+            
+            // Проверяем адрес, если есть
+            if (user.getAddress() != null) {
+                assertThat(user.getAddress().getCity()).isNotEmpty();
+                assertThat(user.getAddress().getStreet()).isNotEmpty();
+            }
+        });
+    }
+    
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 3, 4, 5})
+    @DisplayName("Получение различных пользователей по ID")
+    @Severity(SeverityLevel.NORMAL)
+    void shouldGetDifferentUsersById(int userId) {
+        step("Получаем пользователя с ID " + userId, () -> {
+            User user = apiClient.get("/users/" + userId)
+                    .then()
+                    .spec(successResponseSpec)
+                    .extract().as(User.class);
+            
+            assertThat(user.getId()).isEqualTo(userId);
+            assertThat(user.getEmail()).isNotEmpty();
+            assertThat(user.getName()).isNotEmpty();
+        });
+    }
+    
+    @Test
+    @DisplayName("Получение несуществующего пользователя")
+    @Severity(SeverityLevel.MINOR)
+    void shouldReturn404ForNonExistentUser() {
+        // Given
+        int nonExistentUserId = 999;
+        
+        // When & Then
+        step("Пытаемся получить несуществующего пользователя", () ->
+                apiClient.get("/users/" + nonExistentUserId)
+                        .then()
+                        .spec(errorResponseSpec)
+                        .statusCode(404));
+    }
+}
