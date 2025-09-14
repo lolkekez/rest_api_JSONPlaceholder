@@ -29,29 +29,24 @@ public class UserManagementTests extends BaseTest {
     @Severity(SeverityLevel.CRITICAL)
     @Description("Проверяем корректность получения данных пользователя по валидному ID")
     void shouldGetExistingUserById() {
-        // Given
         int userId = 1;
-        
-        // When
+
         User user = step("Получаем пользователя по ID " + userId, () ->
                 apiClient.get("/users/" + userId)
                         .then()
                         .spec(successResponseSpec)
                         .extract().as(User.class));
-        
-        // Then
+
         step("Проверяем корректность данных пользователя", () -> {
             assertThat(user).isNotNull();
             assertThat(user.getId()).isEqualTo(userId);
             assertThat(user.getName()).isNotEmpty();
             assertThat(user.getEmail()).isNotEmpty();
             assertThat(user.getUsername()).isNotEmpty();
-            
-            // Проверяем, что email содержит @
+
             assertThat(user.getEmail()).contains("@");
             assertThat(user.isValidEmail()).isTrue();
-            
-            // Проверяем адрес, если есть
+
             if (user.getAddress() != null) {
                 assertThat(user.getAddress().getCity()).isNotEmpty();
                 assertThat(user.getAddress().getStreet()).isNotEmpty();
@@ -80,10 +75,8 @@ public class UserManagementTests extends BaseTest {
     @DisplayName("Получение несуществующего пользователя")
     @Severity(SeverityLevel.MINOR)
     void shouldReturn404ForNonExistentUser() {
-        // Given
         int nonExistentUserId = 999;
-        
-        // When & Then
+
         step("Пытаемся получить несуществующего пользователя", () ->
                 apiClient.get("/users/" + nonExistentUserId)
                         .then()

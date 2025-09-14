@@ -12,9 +12,6 @@ import java.util.List;
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Тесты для управления постами
- */
 @DisplayName("Управление постами")
 @Owner("API Testing Team")
 @Feature("Post Management")
@@ -28,19 +25,16 @@ public class PostManagementTests extends BaseTest {
     @Severity(SeverityLevel.CRITICAL)
     @Description("Проверяем получение списка всех постов")
     void shouldGetAllPosts() {
-        // When
         List<Post> posts = step("Получаем все посты", () ->
                 apiClient.get("/posts")
                         .then()
                         .spec(successResponseSpec)
                         .extract().jsonPath().getList("", Post.class));
-        
-        // Then
+
         step("Проверяем список постов", () -> {
             assertThat(posts).isNotEmpty();
             assertThat(posts.size()).isGreaterThan(0);
-            
-            // Проверяем первый пост
+
             Post firstPost = posts.get(0);
             assertThat(firstPost.getId()).isNotNull();
             assertThat(firstPost.getTitle()).isNotEmpty();
@@ -54,17 +48,14 @@ public class PostManagementTests extends BaseTest {
     @Severity(SeverityLevel.CRITICAL)
     @Description("Проверяем получение конкретного поста по ID")
     void shouldGetPostById() {
-        // Given
         int postId = 1;
-        
-        // When
+
         Post post = step("Получаем пост по ID " + postId, () ->
                 apiClient.get("/posts/" + postId)
                         .then()
                         .spec(successResponseSpec)
                         .extract().as(Post.class));
-        
-        // Then
+
         step("Проверяем данные поста", () -> {
             assertThat(post).isNotNull();
             assertThat(post.getId()).isEqualTo(postId);

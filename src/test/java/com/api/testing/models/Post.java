@@ -6,9 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Модель поста для JSONPlaceholder API
- */
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,10 +17,7 @@ public class Post {
     private Integer userId;
     private String title;
     private String body;
-    
-    /**
-     * Проверяет валидность поста
-     */
+
     public boolean isValid() {
         return userId != null && title != null && !title.trim().isEmpty() && body != null;
     }

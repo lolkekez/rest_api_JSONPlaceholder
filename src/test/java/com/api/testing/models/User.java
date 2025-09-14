@@ -6,9 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Модель пользователя для JSONPlaceholder API
- */
 @Data
 @Builder
 @NoArgsConstructor
@@ -55,10 +52,7 @@ public class User {
         private String catchPhrase;
         private String bs;
     }
-    
-    /**
-     * Проверяет валидность email
-     */
+
     public boolean isValidEmail() {
         return email != null && email.contains("@") && email.contains(".");
     }
