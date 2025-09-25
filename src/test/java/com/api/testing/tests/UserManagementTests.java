@@ -83,4 +83,48 @@ public class UserManagementTests extends BaseTest {
                         .spec(errorResponseSpec)
                         .statusCode(404));
     }
+    
+    @Test
+    @DisplayName("Создание нового пользователя")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Проверяем создание нового пользователя через POST запрос")
+    void shouldCreateNewUser() {
+        User newUser = User.builder()
+                .name("John Doe")
+                .username("johndoe")
+                .email("john.doe@example.com")
+                .phone("123-456-7890")
+                .website("johndoe.com")
+                .build();
+
+        User createdUser = step("Создаем нового пользователя", () ->
+                apiClient.post("/users", newUser)
+                        .then()
+                        .spec(createdResponseSpec)
+                        .extract().as(User.class));
+
+        step("Проверяем созданного пользователя", () -> {
+            assertThat(createdUser).isNotNull();
+            assertThat(createdUser.getId()).isNotNull();
+            assertThat(createdUser.getName()).isEqualTo(newUser.getName());
+            assertThat(createdUser.getUsername()).isEqualTo(newUser.getUsername());
+            assertThat(createdUser.getEmail()).isEqualTo(newUser.getEmail());
+            assertThat(createdUser.getPhone()).isEqualTo(newUser.getPhone());
+            assertThat(createdUser.getWebsite()).isEqualTo(newUser.getWebsite());
+        });
+    }
+    
+    @Test
+    @DisplayName("Удаление пользователя")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Проверяем удаление пользователя через DELETE запрос")
+    void shouldDeleteUser() {
+        int userIdToDelete = 1;
+
+        step("Удаляем пользователя с ID " + userIdToDelete, () ->
+                apiClient.delete("/users/" + userIdToDelete)
+                        .then()
+                        .spec(successResponseSpec)
+                        .statusCode(200));
+    }
 }

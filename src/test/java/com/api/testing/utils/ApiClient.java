@@ -6,10 +6,6 @@ import io.restassured.specification.ResponseSpecification;
 
 import static io.restassured.RestAssured.given;
 
-/**
- * Утилитный класс для выполнения HTTP запросов
- * Инкапсулирует логику работы с REST Assured
- */
 public class ApiClient {
     
     private final RequestSpecification requestSpec;

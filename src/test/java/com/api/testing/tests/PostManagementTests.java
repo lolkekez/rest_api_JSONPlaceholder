@@ -65,4 +65,45 @@ public class PostManagementTests extends BaseTest {
             assertThat(post.isValid()).isTrue();
         });
     }
+    
+    @Test
+    @DisplayName("Создание нового поста")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Проверяем создание нового поста через POST запрос")
+    void shouldCreateNewPost() {
+        Post newPost = Post.builder()
+                .userId(1)
+                .title("Новый пост для тестирования")
+                .body("Это тело нового поста, созданного для проверки POST запроса")
+                .build();
+
+        Post createdPost = step("Создаем новый пост", () ->
+                apiClient.post("/posts", newPost)
+                        .then()
+                        .spec(createdResponseSpec)
+                        .extract().as(Post.class));
+
+        step("Проверяем созданный пост", () -> {
+            assertThat(createdPost).isNotNull();
+            assertThat(createdPost.getId()).isNotNull();
+            assertThat(createdPost.getUserId()).isEqualTo(newPost.getUserId());
+            assertThat(createdPost.getTitle()).isEqualTo(newPost.getTitle());
+            assertThat(createdPost.getBody()).isEqualTo(newPost.getBody());
+            assertThat(createdPost.isValid()).isTrue();
+        });
+    }
+    
+    @Test
+    @DisplayName("Удаление поста")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Проверяем удаление поста через DELETE запрос")
+    void shouldDeletePost() {
+        int postIdToDelete = 1;
+
+        step("Удаляем пост с ID " + postIdToDelete, () ->
+                apiClient.delete("/posts/" + postIdToDelete)
+                        .then()
+                        .spec(successResponseSpec)
+                        .statusCode(200));
+    }
 }

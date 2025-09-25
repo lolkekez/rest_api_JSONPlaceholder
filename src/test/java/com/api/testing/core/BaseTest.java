@@ -14,6 +14,7 @@ public abstract class BaseTest {
     
     protected static RequestSpecification requestSpec;
     protected static ResponseSpecification successResponseSpec;
+    protected static ResponseSpecification createdResponseSpec;
     protected static ResponseSpecification errorResponseSpec;
     
     @BeforeAll
@@ -28,6 +29,12 @@ public abstract class BaseTest {
 
         successResponseSpec = new ResponseSpecBuilder()
                 .expectStatusCode(200)
+                .expectContentType(ContentType.JSON)
+                .log(LogDetail.ALL)
+                .build();
+
+        createdResponseSpec = new ResponseSpecBuilder()
+                .expectStatusCode(201)
                 .expectContentType(ContentType.JSON)
                 .log(LogDetail.ALL)
                 .build();
